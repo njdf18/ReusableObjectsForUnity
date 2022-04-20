@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 /// <summary>
 /// Maybe I will use new InputSystem but not now.
 /// Input.GetKeyDown(KeyCode.Space) = @event.IsActionPressed("ui_accept")
@@ -81,7 +82,7 @@ public class DialogueSystemUCS : MonoBehaviour
     }
     public enum Position { Left, Centre, Right }
 
-    private readonly int[] _nameBoxPosX = new int[] { 0, 960, 1768 };
+    private readonly int[] _nameBoxPosX = new int[] { 152, 960, 1768 };
     private readonly float[] _displaySpeedConst = new float[] { 0.01f, 0.05f, 0.1f };
 
     #region Components
@@ -91,12 +92,12 @@ public class DialogueSystemUCS : MonoBehaviour
     [SerializeField] private RawImage _mask, _flash, _readModeBG, _choiceMask;
     [SerializeField] private GameObject _selectionsGridLayer, _tachieLayer, _imageLayer;
     private Button[] _selections;
-    private TextMeshProUGUI[] _selectionsTexts;
+    private TextMeshProUGUI[] _selectionsTexts = new TextMeshProUGUI[5];
     #endregion
 
     public static DialogueSystemUCS Ins;
     [HideInInspector] public bool IsExecuting;
-    [HideInInspector] public int ChoosenIndex;
+    [HideInInspector] public int ChosenIndex;
 
     private bool _dontSkip, _isCountingDown, _animationFinished, _isChosen;
     private int _min, _sec, _ms100;
@@ -114,9 +115,22 @@ public class DialogueSystemUCS : MonoBehaviour
 
     void Awake()
     {
+        if (Ins == null)
+        {
+            Ins = this;
+            DontDestroyOnLoad(Ins);
+        }
+        else
+            Destroy(this);
+    }
+    void Start()
+    {
         _selections = _selectionsGridLayer.GetComponentsInChildren<Button>();
         for (int i = 0; i < _selections.Length; i++)
+        {
             _selectionsTexts[i] = _selections[i].GetComponentInChildren<TextMeshProUGUI>();
+            _selections[i].gameObject.SetActive(false);
+        }
     }
 
     #region Public DialogueSystem Command
@@ -309,11 +323,11 @@ public class DialogueSystemUCS : MonoBehaviour
                     break;
                 case CommandType.Text:
                     {
-                        string nameText = "[center]" + _nowCommand.Paras[0].ToString();
-                        if (!nameText.Equals("[center]System"))
+                        string nameText = _nowCommand.Paras[0].ToString();
+                        if (!nameText.Equals("System"))
                         {
                             SetVisible(_nameBox, true);
-                            _nameBox.rectTransform.anchoredPosition = new Vector2(_nameBoxPosX[(int)_nowCommand.ValueTypeGroup.Positions[0]], 64);
+                            _nameBox.rectTransform.anchoredPosition = new Vector2(_nameBoxPosX[(int)_nowCommand.ValueTypeGroup.Positions[0]], -656);
                             _name.text = nameText;
                         }
                         else
@@ -346,7 +360,7 @@ public class DialogueSystemUCS : MonoBehaviour
                         for (int j = 0; j < content.Length; j++)
                         {
                             _selectionsTexts[j].text = content[j];
-                            SetVisible(_selections[j], true);
+                            _selections[j].gameObject.SetActive(true);
                         }
 
                         _animPlyr.Play("ChoiceBoxOpen");
@@ -354,13 +368,14 @@ public class DialogueSystemUCS : MonoBehaviour
                         _animationFinished = false;
 
                         yield return new WaitUntil(() => _isChosen);
+                        _isChosen = false;
 
                         _animPlyr.Play("ChoiceBoxClose");
                         yield return new WaitUntil(() => _animationFinished);
                         _animationFinished = false;
 
                         for (int j = 0; j < content.Length; j++)
-                            SetVisible(_selections[j], false);
+                            _selections[j].gameObject.SetActive(false);
 
                         Cursor.visible = false;
                         break;
@@ -628,7 +643,7 @@ public class DialogueSystemUCS : MonoBehaviour
     private void SetVisible(MaskableGraphic uiObject, bool state)
     {
         int stateInteger = state ? 1 : 0;
-        uiObject.rectTransform.sizeDelta = new Vector2(stateInteger, stateInteger);
+        uiObject.rectTransform.localScale = new Vector2(stateInteger, stateInteger);
     }
     private void SetVisible(Button uiObject, bool state)
     {
@@ -638,7 +653,7 @@ public class DialogueSystemUCS : MonoBehaviour
     private void WaitIconAnim(bool play)
     {
         SetVisible(_waitIcon, play);
-        if(play)
+        if (play)
             _iconAnimPlyr.Play("WaitIcon_Wait");
         else
             _iconAnimPlyr.Stop();
@@ -678,10 +693,15 @@ public class DialogueSystemUCS : MonoBehaviour
 
         if (CountDownTimeoutHandler != null)
             CountDownTimeoutHandler();
-        
+
         _isCountingDown = false;
         _animPlyr.Play("TimerTextExit");
     }
 
     public void OnAnimationFinished() => _animationFinished = true;
+    public void OnButtonClick(int chosenIndex)
+    {
+        _isChosen = true;
+        ChosenIndex = chosenIndex;
+    }
 }
