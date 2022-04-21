@@ -492,11 +492,9 @@ public class DialogueSystemUCS : MonoBehaviour
                     }
                 case CommandType.SoundStop:
                     {
-                        StartCoroutine(
-                            SoundManager.Ins.AudioFadeOut(
-                                _nowCommand.ValueTypeGroup.SoundChannels[0],
-                                _nowCommand.ValueTypeGroup.Floats[0]
-                            )
+                        SoundManager.Ins.AudioFadeOut(
+                            _nowCommand.ValueTypeGroup.SoundChannels[0],
+                            _nowCommand.ValueTypeGroup.Floats[0]
                         );
                         break;
                     }
