@@ -99,7 +99,7 @@ public class DialogueSystemUCS : MonoBehaviour
     [HideInInspector] public bool IsExecuting;
     [HideInInspector] public int ChosenIndex;
 
-    private bool _dontSkip, _isCountingDown, _animationFinished, _isChosen;
+    private bool _isCountingDown, _animationFinished, _isChosen;
     private int _min, _sec, _ms100;
     private Command _nowCommand;
     private List<Action> _customActions = new List<Action>();
@@ -285,7 +285,11 @@ public class DialogueSystemUCS : MonoBehaviour
         return new Command(CommandType.TimerStop);
     }
     #endregion
-    public IEnumerator Execute(Event @event)
+    public void Execute(Event @event)
+    {
+        StartCoroutine(C_Execute(@event));
+    }
+    private IEnumerator C_Execute(Event @event)
     {
         if (@event.Commands.Count == 0)
         {
@@ -333,11 +337,11 @@ public class DialogueSystemUCS : MonoBehaviour
                         else
                             SetVisible(_nameBox, false);
 
-                        _dontSkip = !_nowCommand.ValueTypeGroup.Booleans[0];
                         _sentence.maxVisibleCharacters = 0;
                         _sentence.text = (string)_nowCommand.Paras[1];
-                        WaitForSeconds displaySpeedWait = new WaitForSeconds(_displaySpeedConst[0]);
                         bool skippable = _nowCommand.ValueTypeGroup.Booleans[0];
+
+                        WaitForSeconds displaySpeedWait = new WaitForSeconds(_displaySpeedConst[1]);
                         for (int j = 1; j < _sentence.text.Length; j++)
                         {
                             if (Input.GetKeyDown(KeyCode.Space) && skippable)
@@ -349,7 +353,6 @@ public class DialogueSystemUCS : MonoBehaviour
                         WaitIconAnim(true);
                         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
                         WaitIconAnim(false);
-                        _dontSkip = false;
                         break;
                     }
                 case CommandType.Choice:
