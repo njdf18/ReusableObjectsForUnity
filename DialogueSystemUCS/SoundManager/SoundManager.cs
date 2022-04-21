@@ -52,7 +52,11 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public IEnumerator AudioFadeOut(SoundChannel channel, float duration)
+    public void AudioFadeOut(SoundChannel channel, float duration)
+    {
+        StartCoroutine(C_AudioFadeOut(channel, duration));
+    }
+    private IEnumerator C_AudioFadeOut(SoundChannel channel, float duration)
     {
         int channelIndex = (int)channel;
         if (channel == SoundChannel.SE || channel == SoundChannel.UISE)
