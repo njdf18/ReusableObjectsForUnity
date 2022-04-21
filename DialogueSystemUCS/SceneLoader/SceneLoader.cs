@@ -22,7 +22,25 @@ public class SceneLoader : MonoBehaviour
             Destroy(this);
     }
 
-    public IEnumerator SceneLoad(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
+    public void SceneLoad(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
+    {
+        StartCoroutine(C_SceneLoad(sceneName, fadeColor, duration, BGMFadeout));
+    }
+    public void SceneLoadAsync(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
+    {
+        StartCoroutine(C_SceneLoadAsync(sceneName, fadeColor, duration, BGMFadeout));
+    }
+    public void ColorBoardFadeIn(Color fadeColor, float duration)
+    {
+        StartCoroutine(C_ColorBoardFadeIn(fadeColor, duration));
+    }
+    public void ColorBoardFadeOut(float duration)
+    {
+        StartCoroutine(C_ColorBoardFadeOut(duration));
+    }
+    
+    // C_ means Coroutine
+    private IEnumerator C_SceneLoad(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
     {
         if (IsLoading)
         {
@@ -60,7 +78,7 @@ public class SceneLoader : MonoBehaviour
         _colorBoard.raycastTarget = false;   // MouseFilterEnum.Ignore
         IsLoading = false;
     }
-    public IEnumerator SceneLoadAsync(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
+    private IEnumerator C_SceneLoadAsync(string sceneName, Color fadeColor, float duration, bool BGMFadeout = false)
     {
         if (IsLoading)
         {
@@ -103,8 +121,7 @@ public class SceneLoader : MonoBehaviour
         _colorBoard.raycastTarget = false;   // MouseFilterEnum.Ignore
         IsLoading = false;
     }
-
-    public IEnumerator ColorBoardFadeIn(Color fadeColor, float duration)
+    private IEnumerator C_ColorBoardFadeIn(Color fadeColor, float duration)
     {
         float timeElapsed = 0f;
         while (timeElapsed < duration)
@@ -114,7 +131,7 @@ public class SceneLoader : MonoBehaviour
             yield return null;
         }
     }
-    public IEnumerator ColorBoardFadeIn(float duration)
+    private IEnumerator C_ColorBoardFadeOut(float duration)
     {
         float timeElapsed = 0f;
         while (timeElapsed < duration)
