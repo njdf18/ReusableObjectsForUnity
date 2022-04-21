@@ -53,7 +53,7 @@ public class SceneLoader : MonoBehaviour
         IsLoading = true;
 
         if (BGMFadeout)
-            StartCoroutine(SoundManager.Ins.AudioFadeOut(SoundManager.SoundChannel.BGM, duration));
+            SoundManager.Ins.AudioFadeOut(SoundManager.SoundChannel.BGM, duration);
 
         // Fade in
         float timeElapsed = 0f, halfDuration = duration / 2;
@@ -91,7 +91,7 @@ public class SceneLoader : MonoBehaviour
         IsLoading = true;
 
         if (BGMFadeout)
-            StartCoroutine(SoundManager.Ins.AudioFadeOut(SoundManager.SoundChannel.BGM, duration));
+            SoundManager.Ins.AudioFadeOut(SoundManager.SoundChannel.BGM, duration);
 
         // Fade in
         float timeElapsed = 0f, halfDuration = duration / 2;
