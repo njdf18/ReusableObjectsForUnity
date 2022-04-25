@@ -99,7 +99,7 @@ public class DialogueSystemUCS : MonoBehaviour
     [HideInInspector] public bool IsExecuting;
     [HideInInspector] public int ChosenIndex;
 
-    private bool _isCountingDown, _animationFinished, _isChosen;
+    private bool _isCountingDown, _isChosen;
     private int _min, _sec, _ms100;
     private Command _nowCommand;
     private List<Action> _customActions = new List<Action>();
@@ -367,15 +367,13 @@ public class DialogueSystemUCS : MonoBehaviour
                         }
 
                         _animPlyr.Play("ChoiceBoxOpen");
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ChoiceBoxOpen"));
 
                         yield return new WaitUntil(() => _isChosen);
                         _isChosen = false;
 
                         _animPlyr.Play("ChoiceBoxClose");
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ChoiceBoxClose"));
 
                         for (int j = 0; j < content.Length; j++)
                             _selections[j].gameObject.SetActive(false);
@@ -403,15 +401,16 @@ public class DialogueSystemUCS : MonoBehaviour
                     }
                 case CommandType.BoxState:
                     {
+                        string animName = string.Empty;
                         if (_nowCommand.ValueTypeGroup.Booleans[0])  // state
-                            _animPlyr.Play("SentenceBoxOpen");
+                            animName = "SentenceBoxOpen";
                         else
                         {
                             SetVisible(_nameBox, false);
-                            _animPlyr.Play("SentenceBoxClose");
+                            animName = "SentenceBoxClose";
                         }
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        _animPlyr.Play(animName);
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying(animName));
 
                         _sentence.text = string.Empty;
                         break;
@@ -553,8 +552,7 @@ public class DialogueSystemUCS : MonoBehaviour
                         SetVisible(_readModeBG, true);
                         _animPlyr.Play("ReadModeEnter");
 
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ReadModeEnter"));
                         break;
                     }
                 case CommandType.ReadModeText:
@@ -585,14 +583,12 @@ public class DialogueSystemUCS : MonoBehaviour
                         lastReadModeStrNum = 0;
                         _animPlyr.Play("ReadModeSentenceClean");
 
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ReadModeSentenceClean"));
 
                         _readModeSentence.text = string.Empty;
                         _animPlyr.Play("ReadModeSentenceEnter");
 
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ReadModeSentenceClean"));
                         break;
                     }
                 case CommandType.ReadModeEnd:
@@ -601,8 +597,7 @@ public class DialogueSystemUCS : MonoBehaviour
                         lastReadModeStrNum = 0;
                         _animPlyr.Play("ReadModeExit");
 
-                        yield return new WaitUntil(() => _animationFinished);
-                        _animationFinished = false;
+                        yield return new WaitUntil(() => !_animPlyr.IsPlaying("ReadModeExit"));
 
                         SetVisible(_readModeBG, false);
                         break;
@@ -699,7 +694,6 @@ public class DialogueSystemUCS : MonoBehaviour
         _animPlyr.Play("TimerTextExit");
     }
 
-    public void OnAnimationFinished() => _animationFinished = true;
     public void OnButtonClick(int chosenIndex)
     {
         _isChosen = true;
