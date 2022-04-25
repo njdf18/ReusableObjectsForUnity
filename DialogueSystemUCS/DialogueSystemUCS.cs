@@ -19,6 +19,12 @@ public class DialogueSystemUCS : MonoBehaviour
 
         public void EventPreprocess()
         {
+            if(IsPreprocessed)
+            {
+                Debug.LogWarning("There is no need to preprocess the event again now.");
+                return;
+            }
+
             for (int i = 0; i < Commands.Count; i++)
             {
                 if (Commands[i].Code == CommandType.Label)
